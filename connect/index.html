@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width" charset="utf-8">
-    <title>connect-keycloak</title>
+    <title>connect-keyclaok</title>
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css">
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css">
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/docs.css">
@@ -63,7 +63,7 @@
     </div>
     <header id="overview" class="jumbotron subhead">
       <div class="container">
-        <h1>connect-keycloak</h1>
+        <h1>connect-keyclaok</h1>
         <p class="lead"></p>
       </div>
     </header>
@@ -81,7 +81,8 @@
         </div>
         <div class="span9">
           <section id="Main"><h1>Keycloak</h1>
-<p><a href="http://keycloak.jboss.org/">Keycloak</a> is a standalone authentication<br />server, akin to a standalone database.  It provides hooks for federated<br />authentication, including authenticating against various social networks<br />and OAuth providers (G+, Facebook, etc).</p><p>This module makes it simple to implement a Node.js Connect-friendly<br />application that uses Keycloak for its authentication and authorization needs.</p><h2>Instantiate a Keycloak</h2>
+<p><a href="http://keycloak.jboss.org/">Keycloak</a> is a standalone authentication<br />server, akin to a standalone database.  It provides hooks for federated<br />authentication, including authenticating against various social networks<br />and OAuth providers (G+, Facebook, etc).</p><p>This module makes it simple to implement a Node.js Connect-friendly<br />application that uses Keycloak for its authentication and authorization needs.</p><h2>Install</h2>
+<p>  npm install --save-dev connect-keycloak</p><h2>Instantiate a Keycloak</h2>
 <p>The <code>Keycloak</code> class provides a central point for configuration<br />and integration with your application.  The simplest creation<br />involves no arguments.</p><p>   var keycloak = new Keycloak()</p><p>By default, this will locate a file named <code>keycloak.json</code> alongside<br />the main executable of your application to initialize keycloak-specific<br />settings (public key, realm name, various URLs).  The <code>keycloak.json</code> file<br />is obtained from the Keycloak Admin Console.</p><p>Instantiation with this method results in all of the reasonable defaults<br />being used.  Normally, though, if you wish to use web sessions to manage<br />server-side state for authentication, you will need to initialize the<br /><code>KeyCloak(...)</code> with at least a <code>store</code> parameter, passing in the actual<br />session store that <code>express-session</code> is using.</p><pre><code>var session = require(&#39;express-session&#39;);
 var memoryStore = new session.MemoryStore();
 
