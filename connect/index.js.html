@@ -86,6 +86,8 @@
               </li>
               <li><a href="#deauthenticated"><i class="alert alert-info"></i><span>deauthenticated</span></a>
               </li>
+              <li><a href="#accessDenied"><i class="alert alert-info"></i><span>accessDenied</span></a>
+              </li>
             </ul>
           </div>
         </div>
@@ -279,6 +281,18 @@ app.get( &#39;/fancy/:page&#39;, keycloak.protect( pants ), myPantsHandler );
           <div class="description"><p>Callback made upon successful de-authentication of a user.</p><p>By default, this is a no-op, but may be used by the application<br />in the case it needs to remove information from the user&#39;s session<br />or otherwise perform additional logic once a user is logged out.</p> </div>
           <pre><code class="language-javascript">Keycloak.prototype.deauthenticated = function(request) {
   // no-op
+};</code></pre>
+          <section id="accessDenied">
+            <h1>accessDenied</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>Keycloak.prototype.accessDenied()</span>
+            </p>
+          </section>
+          <div class="description"><p>Replaceable function to handle access-denied responses.</p><p>In the event the Keycloak middleware decides a user may<br />not access a resource, or has failed to authenticate at all,<br />this function will be called.</p><p>By default, a simple string of &quot;Access denied&quot; along with<br />an HTTP status code for 403 is returned.  Chances are an<br />application would prefer to render a fancy template.</p> </div>
+          <pre><code class="language-javascript">Keycloak.prototype.accessDenied = function(request, response) {
+  response.status( 403 );
+  response.end( &quot;Access denied&quot; );
 };</code></pre>
         </div>
       </div>

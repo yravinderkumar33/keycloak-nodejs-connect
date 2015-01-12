@@ -546,7 +546,7 @@
     return;
   }
 
-  if ( token.content.issuedAt &lt; this.notBefore ) {
+  if ( token.content.iat &lt; this.notBefore ) {
     return;
   }
 
@@ -584,7 +584,6 @@ GrantManager.prototype.getAccount = function(token, callback) {
   };
 
   var req = http.request( options, function(response) {
-    console.log( &quot;RESPONSE&quot;, response.statusCode );
     if ( response.statusCode &lt; 200 || response.statusCode &gt;= 300 ) {
       return deferred.reject( &quot;Error fetching account&quot; );
     }
@@ -597,7 +596,6 @@ GrantManager.prototype.getAccount = function(token, callback) {
       if ( data.error ) {
         return deferred.reject( data );
       }
-      console.log( &quot;ACCOUNT&quot;, data );
       return deferred.resolve( data );
     });
   });
