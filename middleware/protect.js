@@ -24,7 +24,7 @@ function forceLogin (keycloak, request, response) {
   let protocol = request.headers['x-forwarded-proto'] || request.protocol;
   let hasQuery = ~(request.originalUrl || request.url).indexOf('?');
 
-  let redirectUrl = protocol + '://' + host + (port === '' ? '' : ':' + port) + (request.originalUrl || request.url) + (hasQuery ? '&' : '?') + 'auth_callback=1&version=1';
+  let redirectUrl = protocol + '://' + host + (port === '' ? '' : ':' + port) + (request.originalUrl || request.url) + (hasQuery ? '&' : '?') + 'auth_callback=1';
 
   if (request.session) {
     request.session.auth_redirect_uri = redirectUrl;
@@ -32,6 +32,7 @@ function forceLogin (keycloak, request, response) {
 
   let uuid = UUID();
   let loginURL = keycloak.loginUrl(uuid, redirectUrl);
+  loginURL = loginURL + "&version=1";
   response.redirect(loginURL);
 }
 
