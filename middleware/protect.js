@@ -32,7 +32,7 @@ function forceLogin (keycloak, request, response) {
 
   let uuid = UUID();
   let loginURL = keycloak.loginUrl(uuid, redirectUrl);
-  loginURL = loginURL + "&version=2";
+  loginURL = loginURL + "&version=4";
   response.redirect(loginURL);
 }
 
