@@ -16,11 +16,8 @@ Discussions can be done via:
 
 Documentation:
 
-[Web site docs](http://keycloak.jboss.org/docs) - User Guide, Admin REST API and Javadocs
-
-[Git books](https://www.gitbook.com/@keycloak) - Authorization Services, Server Administration Guide, Server Developer Guide,
-Server Installation and Configuration Guide, Securing Applications and Services Guide, Getting Started Guide
-
+[Web site docs](http://www.keycloak.org/documentation.html) - Authorization Services, Server Administration Guide, Server Developer Guide,
+Server Installation and Configuration Guide, Securing Applications and Services Guide, Getting Started Guide, Admin REST API and Javadocs
 
 ## Code contributions
 
@@ -90,7 +87,7 @@ Bug fixes and features should come with tests. Add your tests in the
 To write the tests you will need keycloak server running, so run this script:
 
 ```shell
-$ ./scripts/build/start-server.sh
+$ ./scripts/start-server.sh
 ```
 This will download, configure and start keycloak server.
 
@@ -109,7 +106,7 @@ $ make
 Then to stop the server by running this script:
 
 ```shell
-$ ./scripts/build/stop-server.sh
+$ ./scripts/stop-server.sh
 ```
 
 Make sure the jshint and semistandard are happy and that all tests pass. Please, do not submit
