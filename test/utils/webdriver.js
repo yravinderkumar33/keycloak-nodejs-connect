@@ -23,7 +23,7 @@ const By = webdriver.By;
 const until = webdriver.until;
 
 const driver = new webdriver.Builder()
-  .withCapabilities({'phantomjs.binary.path': phantomjs.path})
+  .withCapabilities({ 'phantomjs.binary.path': phantomjs.path })
   .forBrowser('phantomjs')
   .build();
 
@@ -37,7 +37,7 @@ function waitForElement (locator, t) {
 function waitForVisibleElement (locator, t) {
   var timeout = t || 3000;
   var element = driver.wait(until.elementLocated(locator), timeout);
-  return driver.wait(new until.WebElementCondition('for element to be visible ' + locator, function () {
+  return driver.wait(new webdriver.WebElementCondition('for element to be visible ' + locator, function () {
     return element.isDisplayed().then(x => x ? element : null);
   }), timeout);
 }
@@ -76,6 +76,10 @@ ConsolePage.prototype.print = function () {
   });
 };
 
+ConsolePage.prototype.grantedResourceButton = function () {
+  return driver.findElement(By.xpath("//button[text() = 'Granted Resource']"));
+};
+
 ConsolePage.prototype.login = function (user, pass) {
   waitForVisibleElement(By.id('username'), 100000);
   var username = driver.findElement(By.id('username'));
@@ -89,8 +93,27 @@ ConsolePage.prototype.login = function (user, pass) {
   driver.findElement(By.name('login')).click();
 };
 
+/**
+ * Logouts directly with support for a wait period
+ *
+ * @param port
+ * @returns {Promise<any>}
+ */
+ConsolePage.prototype.logout = function (port) {
+  this.get(port, '/logout');
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve();
+    }, 2000);
+  });
+};
+
 ConsolePage.prototype.body = () => {
   return driver.findElement(By.tagName('pre'));
+};
+
+ConsolePage.prototype.h1 = () => {
+  return driver.findElement(By.tagName('h1'));
 };
 
 var newPage = new ConsolePage();

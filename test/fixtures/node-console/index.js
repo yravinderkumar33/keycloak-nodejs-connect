@@ -16,11 +16,21 @@
 'use strict';
 
 const Keycloak = require('../../../index');
+const bodyParser = require('body-parser');
 const hogan = require('hogan-express');
 const express = require('express');
 const session = require('express-session');
 const enableDestroy = require('server-destroy');
 const parseClient = require('../../utils/helper').parseClient;
+
+Keycloak.prototype.redirectToLogin = function (req) {
+  var apiMatcher = /^\/service\/.*/i;
+  return !apiMatcher.test(req.baseUrl);
+};
+
+Keycloak.prototype.obtainDirectly = function (user, pass) {
+  return this.grantManager.obtainDirectly(user, pass);
+};
 
 function NodeApp () {
   var app = express();
@@ -52,7 +62,12 @@ function NodeApp () {
     return parseClient('test/fixtures/templates/confidential-template.json', this.port, name);
   };
 
-  this.build = function (kcConfig) {
+  this.enforcerResourceServer = function (app) {
+    var name = app || 'resource-server-app';
+    return parseClient('test/fixtures/templates/resource-server-template.json', this.port, name);
+  };
+
+  this.build = function (kcConfig, params) {
     app.set('view engine', 'html');
     app.set('views', require('path').join(__dirname, '/views'));
     app.engine('html', hogan);
@@ -74,9 +89,8 @@ function NodeApp () {
     //
     // Additional configuration is read from keycloak.json file
     // installed from the Keycloak web console.
-    var keycloak = new Keycloak({
-      store: memoryStore
-    }, kcConfig);
+    params = params || { store: memoryStore };
+    var keycloak = new Keycloak(params, kcConfig);
 
     // A normal un-protected public URL.
     app.get('/', function (req, res) {
@@ -102,21 +116,81 @@ function NodeApp () {
       output(res, JSON.stringify(JSON.parse(req.session['keycloak-token']), null, 4), 'Auth Success');
     });
 
+    app.get('/check-sso', keycloak.checkSso(), function (req, res) {
+      var authenticated = 'Check SSO Success (' + (req.session['keycloak-token'] ? 'Authenticated' : 'Not Authenticated') + ')';
+      output(res, authenticated);
+    });
+
     app.get('/restricted', keycloak.protect('realm:admin'), function (req, res) {
       var user = req.kauth.grant.access_token.content.preferred_username;
       output(res, user, 'Restricted access');
     });
 
     app.get('/service/public', function (req, res) {
-      res.json({message: 'public'});
+      res.json({ message: 'public' });
     });
 
     app.get('/service/secured', keycloak.protect('realm:user'), function (req, res) {
-      res.json({message: 'secured'});
+      res.json({ message: 'secured' });
     });
 
     app.get('/service/admin', keycloak.protect('realm:admin'), function (req, res) {
-      res.json({message: 'admin'});
+      res.json({ message: 'admin' });
+    });
+
+    app.get('/service/grant', keycloak.protect(), (req, res, next) => {
+      keycloak.getGrant(req, res)
+        .then(grant => {
+          res.json(grant);
+        })
+        .catch(next);
+    });
+
+    app.post('/service/grant', bodyParser.json(), (req, res, next) => {
+      if (!req.body.username || !req.body.password) {
+        res.status(400).send('Username and password required');
+      }
+      keycloak.obtainDirectly(req.body.username, req.body.password)
+        .then(grant => {
+          keycloak.storeGrant(grant, req, res);
+          res.json(grant);
+        })
+        .catch(next);
+    });
+
+    app.get('/protected/enforcer/resource', keycloak.enforcer('resource:view'), function (req, res) {
+      res.json({ message: 'resource:view', permissions: req.permissions });
+    });
+
+    app.post('/protected/enforcer/resource', keycloak.enforcer('resource:update'), function (req, res) {
+      res.json({ message: 'resource:update', permissions: req.permissions });
+    });
+
+    app.delete('/protected/enforcer/resource', keycloak.enforcer('resource:delete'), function (req, res) {
+      res.json({ message: 'resource:delete', permissions: req.permissions });
+    });
+
+    app.get('/protected/enforcer/resource-view-delete', keycloak.enforcer(['resource:view', 'resource:delete']), function (req, res) {
+      res.json({ message: 'resource:delete', permissions: req.permissions });
+    });
+
+    app.get('/protected/enforcer/resource-claims', keycloak.enforcer(['photo'], {
+      claims: function (request) {
+        return {
+          user_agent: [request.query.user_agent]
+        };
+      }
+    }), function (req, res) {
+      res.json({ message: req.query.user_agent, permissions: req.permissions });
+    });
+
+    app.get('/protected/enforcer/no-permission-defined', keycloak.enforcer(), function (req, res) {
+      res.json({ message: 'always grant', permissions: req.permissions });
+    });
+
+    app.get('/protected/web/resource', keycloak.enforcer(['resource:view']), function (req, res) {
+      var user = req.kauth.grant.access_token.content.preferred_username;
+      output(res, user, 'Granted');
     });
 
     app.use('*', function (req, res) {

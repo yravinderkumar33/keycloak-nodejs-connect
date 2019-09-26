@@ -2,9 +2,13 @@ sudo: required
 dist: trusty
 language: node_js
 node_js:
-  - "4"
   - "6"
-  - "7"
+  - "8"
+  - "10"
+  - "11"
+
+services:
+  - docker
 
 after_success:
   - 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls'
@@ -12,11 +16,11 @@ after_success:
 install:
   - npm install
 
-before_script:
+before_install:
   - ./scripts/start-server.sh
 
-script: make tests
+before_script:
+  - make lint
 
-after_script:
-  - ./scripts/stop-server.sh
-  - kill -9 `cat pid.txt`
+script: 
+  - ./run-tests.sh

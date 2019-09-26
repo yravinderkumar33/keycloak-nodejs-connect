@@ -23,6 +23,11 @@ module.exports = function (keycloak) {
       return next();
     }
 
+    //  During the check SSO process the Keycloak server answered the user is not logged in
+    if (request.query.error === 'login_required') {
+      return next();
+    }
+
     if (request.query.error) {
       return keycloak.accessDenied(request, response, next);
     }
@@ -37,6 +42,7 @@ module.exports = function (keycloak) {
         delete urlParts.query.code;
         delete urlParts.query.auth_callback;
         delete urlParts.query.state;
+        delete urlParts.query.session_state;
 
         let cleanUrl = URL.format(urlParts);
 
@@ -48,7 +54,7 @@ module.exports = function (keycloak) {
         }
         response.redirect(cleanUrl);
       }).catch((err) => {
-        keycloak.accessDenied(request, response);
+        keycloak.accessDenied(request, response, next);
         console.error('Could not obtain grant code: ' + err);
       });
   };
