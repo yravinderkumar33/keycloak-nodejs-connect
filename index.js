@@ -272,6 +272,7 @@ Keycloak.prototype.storeGrant = function (grant, request, response) {
     return;
   }
   if (!grant) {
+    console.log('Error from storeGrant when grant is not present', { grant });
     this.accessDenied(request, response);
     return;
   }
