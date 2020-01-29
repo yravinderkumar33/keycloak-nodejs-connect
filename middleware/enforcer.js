@@ -132,9 +132,10 @@ Enforcer.prototype.enforce = function enforce (expectedPermissions) {
           request.permissions = permissions;
           return next();
         }
-
+        console.log('Error from enforce when handlePermissions return false', { expectedPermissions, mode: config.response_mode })
         return keycloak.accessDenied(request, response, next);
-      }).catch(function () {
+      }).catch(function (err) {
+        console.log('Error from enforce method when keycloack checkperimission promise rejects', { err, expectedPermissions, mode: config.response_mode})
         return keycloak.accessDenied(request, response, next);
       });
     } else if (config.response_mode === 'token') {
@@ -147,9 +148,10 @@ Enforcer.prototype.enforce = function enforce (expectedPermissions) {
         })) {
           return next();
         }
-
+        console.log('Error from enforce when handlePermissions return false', { expectedPermissions, mode: config.response_mode })
         return keycloak.accessDenied(request, response, next);
-      }).catch(function () {
+      }).catch(function (err) {
+        console.log('Error from enforce method when keycloack checkperimission promise rejects', { err, expectedPermissions, mode: config.response_mode})
         return keycloak.accessDenied(request, response, next);
       });
     }

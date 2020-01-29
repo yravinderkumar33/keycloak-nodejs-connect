@@ -141,6 +141,7 @@ GrantManager.prototype.checkPermissions = function obtainPermissions (authzReque
       if (request.kauth && request.kauth.grant && request.kauth.grant.access_token) {
         bearerToken = request.kauth.grant.access_token.token;
       } else {
+        console.log('Error in keycloack checkPermissions when no beared is present in header', {kauth: request.kauth});
         return Promise.reject(new Error('No bearer in header'));
       }
     }

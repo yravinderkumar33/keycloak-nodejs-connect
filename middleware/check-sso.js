@@ -73,6 +73,7 @@ module.exports = function (keycloak) {
     if (keycloak.redirectToLogin(request)) {
       forceCheckSSO(keycloak, request, response);
     } else {
+      console.log('Error from checkSso', { queryObj: request.query});
       return keycloak.accessDenied(request, response, next);
     }
   };

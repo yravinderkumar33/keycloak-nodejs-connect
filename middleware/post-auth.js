@@ -29,6 +29,7 @@ module.exports = function (keycloak) {
     }
 
     if (request.query.error) {
+      console.log('Error from postAuth', { queryObj: request.query});
       return keycloak.accessDenied(request, response, next);
     }
 
@@ -54,6 +55,7 @@ module.exports = function (keycloak) {
         }
         response.redirect(cleanUrl);
       }).catch((err) => {
+        console.log('Error from postauth > getGrantFromCode', {err, queryObj : request.query});
         keycloak.accessDenied(request, response, next);
         console.error('Could not obtain grant code: ' + err);
       });

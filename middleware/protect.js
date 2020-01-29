@@ -54,13 +54,14 @@ module.exports = function (keycloak, spec) {
       if (!guard || guard(request.kauth.grant.access_token, request, response)) {
         return next();
       }
-
+      console.log('Error from protect', { kauth: request.kauth});
       return keycloak.accessDenied(request, response, next);
     }
 
     if (keycloak.redirectToLogin(request)) {
       forceLogin(keycloak, request, response);
     } else {
+      console.log('Error from keycloack protect when redirectToLogin returns false');
       return keycloak.accessDenied(request, response, next);
     }
   };
